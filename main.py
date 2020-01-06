@@ -39,6 +39,8 @@ print(df_small_f2.count())
 # df_small_f3.show(100)
 print(df_small_f3.count())
 
+df_small_f3.coalesce(1).write.csv('df_small_f3.csv')
+
 spark.sparkContext.stop()
 
 
