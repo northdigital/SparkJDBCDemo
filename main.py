@@ -24,7 +24,7 @@ print(f'trak_detail table has {df_trak_detail.count()} records')
 # df_trak_detail.show(10)
 
 df_small = df_trak_detail\
-  .select(['MEMB_LINKID', 'GAMEDATE', 'PLAY_TIME', 'AVG_BET'])\
+  .select('MEMB_LINKID', 'GAMEDATE', 'PLAY_TIME', 'AVG_BET')\
   .cache()
 # df_small.show(10)
 
@@ -39,13 +39,14 @@ print(df_small_f2.count())
 # df_small_f3.show(100)
 print(df_small_f3.count())
 
-df_small_f3.coalesce(1).write.csv('df_small_f3.csv')
+df_small_f3.coalesce(1).write.csv(path='df_small_f3.csv', header=True,mode='overwrite')
 df_small_f3.write.format('jdbc')\
   .option('url', 'jdbc:oracle:thin:@centos06:1521/casinodev')\
   .option('driver', 'oracle.jdbc.OracleDriver')\
   .option('user', 'system')\
   .option('password', 'sporades')\
   .option('dbtable', 'casinocrm.datawarehouse')\
+  .mode('overwrite')\
   .save()
 
 spark.sparkContext.stop()
