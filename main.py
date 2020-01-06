@@ -1,5 +1,6 @@
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
 
 spark = SparkSession\
   .builder\
@@ -16,14 +17,27 @@ df_trak_detail = spark.read.format('jdbc')\
   .option('password', 'sporades')\
   .option('dbtable', 'logismos.trak_detail')\
   .load()\
-  .detail.cache()
+  .cache()
 
 print(f'trak_detail table has {df_trak_detail.count()} records')
+# df_trak_detail.printSchema()
+# df_trak_detail.show(10)
 
-df_trak_detail.show(10)
+df_small = df_trak_detail\
+  .select(['MEMB_LINKID', 'GAMEDATE', 'PLAY_TIME', 'AVG_BET'])\
+  .cache()
+# df_small.show(10)
 
-small_df = df_trak_detail.select(['MEMB_LINKID', 'GAMEDATE', 'PLAY_TIME', 'AVG_BET'])
-small_df.show(10)
+df_small_f1 = df_small.filter('MEMB_LINKID >= 300760 and MEMB_LINKID <= 300770')
+df_small_f2 = df_small.filter((df_small['MEMB_LINKID'] >= 300760) & (df_small['MEMB_LINKID'] <= 300770))
+df_small_f3 = df_small.filter((col('MEMB_LINKID') >= 300760) & (col('MEMB_LINKID') <= 300770))
+
+# df_small_f1.show(100)
+print(df_small_f1.count())
+# df_small_f2.show(100)
+print(df_small_f2.count())
+# df_small_f3.show(100)
+print(df_small_f3.count())
 
 spark.sparkContext.stop()
 
