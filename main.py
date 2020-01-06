@@ -7,8 +7,7 @@ spark = SparkSession\
   .master('spark://aphrodite:7077')\
   .getOrCreate()
 
-rdd = spark.sparkContext.parallelize([1, 2, 3, 4, 5])
-print(rdd.collect())
+print('reading logismos.trak_detail table')
 
 df_trak_detail = spark.read.format('jdbc')\
   .option('url', 'jdbc:oracle:thin:@centos06:1521/casinodev')\
@@ -16,11 +15,15 @@ df_trak_detail = spark.read.format('jdbc')\
   .option('user', 'system')\
   .option('password', 'sporades')\
   .option('dbtable', 'logismos.trak_detail')\
-  .load()
+  .load()\
+  .detail.cache()
 
-print(df_trak_detail.count())
+print(f'trak_detail table has {df_trak_detail.count()} records')
 
-input('press <enter> to exit')
+df_trak_detail.show(10)
+
+small_df = df_trak_detail.select(['MEMB_LINKID', 'GAMEDATE', 'PLAY_TIME', 'AVG_BET'])
+small_df.show(10)
 
 spark.sparkContext.stop()
 
