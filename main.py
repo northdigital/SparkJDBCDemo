@@ -5,7 +5,7 @@ from pyspark.sql.functions import col
 spark = SparkSession\
   .builder\
   .appName('JDBCDemo App')\
-  .master('spark://aphrodite:7077')\
+  .master('spark://centos07:7077')\
   .getOrCreate()
 
 print('reading logismos.trak_detail table')
@@ -28,19 +28,17 @@ df_small = df_trak_detail\
   .cache()
 # df_small.show(10)
 
-df_small_f1 = df_small.filter('MEMB_LINKID >= 300760 and MEMB_LINKID <= 300770')
-df_small_f2 = df_small.filter((df_small['MEMB_LINKID'] >= 300760) & (df_small['MEMB_LINKID'] <= 300770))
-df_small_f3 = df_small.filter((col('MEMB_LINKID') >= 300760) & (col('MEMB_LINKID') <= 300770))
+print('filtering...')
 
-# df_small_f1.show(100)
-print(df_small_f1.count())
-# df_small_f2.show(100)
-print(df_small_f2.count())
-# df_small_f3.show(100)
-print(df_small_f3.count())
+df_small_f = df_small.filter('MEMB_LINKID >= 300760 and MEMB_LINKID <= 300770')
+# df_small_f = df_small.filter((df_small['MEMB_LINKID'] >= 300760) & (df_small['MEMB_LINKID'] <= 300770))
+# df_small_f = df_small.filter((col('MEMB_LINKID') >= 300760) & (col('MEMB_LINKID') <= 300770))
 
-df_small_f3.coalesce(1).write.csv(path='df_small_f3.csv', header=True,mode='overwrite')
-df_small_f3.write.format('jdbc')\
+# df_small_f.show(100)
+print(df_small_f.count())
+
+# df_small_f.coalesce(1).write.csv(path='df_small_f3.csv', header=True,mode='overwrite')
+df_small_f.write.format('jdbc')\
   .option('url', 'jdbc:oracle:thin:@centos06:1521/casinodev')\
   .option('driver', 'oracle.jdbc.OracleDriver')\
   .option('user', 'system')\
@@ -48,6 +46,8 @@ df_small_f3.write.format('jdbc')\
   .option('dbtable', 'casinocrm.datawarehouse')\
   .mode('overwrite')\
   .save()
+
+input('press <enter> to exit')
 
 spark.sparkContext.stop()
 
